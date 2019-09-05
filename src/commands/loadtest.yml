@@ -38,6 +38,28 @@ parameters:
     description: "which branch to get orb support code from"
 steps:
   - run:
+      name: checking for required python version
+      command: |
+          targetVersion="3.6"
+          errMsg="python $targetVersion is not available in this environment"
+
+          if ! hash python3; then
+              echo  $errMsg
+              exit 1
+          fi
+
+          pyVersion="$(python3 -V 2>&1)"
+          echo $pyVersion
+
+          if [[ $pyVersion =~ $targetVersion ]]
+          then
+              echo found $pyVersion
+              exit 0
+          else
+              echo $errMsg
+          fi
+          exit 1
+  - run:
       name: fetching code (<< parameters.branch >>)
       command: wget https://raw.githubusercontent.com/neocortix/cci_loadtest/<< parameters.branch >>/runRemoteLoadtest.py
   - run:
