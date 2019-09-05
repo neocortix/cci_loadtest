@@ -1,4 +1,3 @@
-name: "Build and Loadtest using a workflow"
 description: >
   This mainstream example does a small loadtest using a workflow with a job based on the orb.
   To use this orb, you need to define a $NCS_AUTH_TOKEN environment variable.
