@@ -7,6 +7,19 @@ orbs:
   loadtest: neocortix/loadtest@dev:alpha
   orb-tools: circleci/orb-tools@8.27.3
 
+# yaml anchor filters
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
@@ -58,66 +71,80 @@ workflows:
 
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above
-  # integration-tests_prod-release:
-  #   jobs:
-  #     # - your integration test jobs go here
-  #     # - you will want to call each integration testing job twice,
-  #     # - each under a different name:
-  #     # - once, for integration tests triggered by non-master-branch commits
-  #     # - and again, for tests triggered by commits to master
-  #     # - only commits to master should potentially trigger a prod release
+  integration-tests_prod-release:
+    jobs:
+      # - your integration test jobs go here
+      # - you will want to define each integration testing job twice,
+      # - each under a different name, with a different "filters" parameter:
+      # - once, for integration tests triggered by non-master-branch commits
+      # - and again, for tests triggered by commits to master
+      # - only commits to master should potentially trigger a prod release
 
-  #     # patch, minor, or major publishing
-  #     - orb-tools/dev-promote-prod:
-  #         name: dev-promote-patch
-  #         orb-name: circleci/orb-tools
-  #         ssh-fingerprints: # your SSH key fingerprint
-  #         cleanup-tags: true
-  #         requires:
-  #           # - your integration testing jobs go here
-  #         filters:
-  #           branches:
-  #             ignore: /.*/
-  #           tags:
-  #             only: /master-patch.*/
+      # the project needs a $NCS_AUTH_TOKEN env var for these tests to run successfully
+      - loadtest/loadtest:
+          name: test-orb-dev
+          filters: *integration-dev_filters
+          branch: Alpha
+          targetHostUrl: "https://www.example.com"
+          nWorkers: 3
+          susTime: 15
+          #altTargetHostUrl: "https://www.google.com"
+          regions: >-
+            north-america russia-ukraine-belarus
+          targetUris: >-
+            /index.html
+          usersPerWorker: 1
+      - loadtest/loadtest:
+          name: test-orb-master
+          filters: *integration-master_filters
+          branch: master
+          targetHostUrl: "https://www.example.com"
+          nWorkers: 4
+          susTime: 30
+          altTargetHostUrl: "https://www.google.com"
+          regions: >-
+            north-america russia-ukraine-belarus
+          targetUris: >-
+            /index.html
+          usersPerWorker: 1
+      # patch, minor, or major publishing
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
+          orb-name: circleci/orb-tools
+          ssh-fingerprints: "85:97:08:9b:b0:ce:bc:0e:0d:dd:da:da:f6:3e:8c:11"
+          cleanup-tags: true
+          requires:
+            - test-orb-dev
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
 
-  #     - orb-tools/dev-promote-prod:
-  #         name: dev-promote-minor
-  #         release: minor
-  #         orb-name: circleci/orb-tools
-  #         ssh-fingerprints: # your SSH key fingerprint
-  #         cleanup-tags: true
-  #         requires:
-  #           # - your integration testing jobs go here
-  #         filters:
-  #           branches:
-  #             ignore: /.*/
-  #           tags:
-  #             only: /master-minor.*/
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          release: minor
+          orb-name: circleci/orb-tools
+          ssh-fingerprints: "85:97:08:9b:b0:ce:bc:0e:0d:dd:da:da:f6:3e:8c:11"
+          cleanup-tags: true
+          requires:
+            - test-orb-master
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
 
-  #     - orb-tools/dev-promote-prod:
-  #         name: dev-promote-major
-  #         release: major
-  #         orb-name: circleci/orb-tools
-  #         ssh-fingerprints: # your SSH key fingerprint
-  #         cleanup-tags: true
-  #         requires:
-  #           # - your integration testing jobs go here
-  #         filters:
-  #           branches:
-  #             ignore: /.*/
-  #           tags:
-  #             only: /master-major.*/
-
-# yaml anchor filters
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
-
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          release: major
+          orb-name: circleci/orb-tools
+          ssh-fingerprints: "85:97:08:9b:b0:ce:bc:0e:0d:dd:da:da:f6:3e:8c:11"
+          cleanup-tags: true
+          requires:
+            - test-orb-master
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/
