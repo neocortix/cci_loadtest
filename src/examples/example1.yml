@@ -1,3 +1,4 @@
+name: "Minimal Loadtest-only example"
 description: >
   This simple python-oriented example does a small loadtest using a command based on the orb.
   To use this orb, you need to define a $NCS_AUTH_TOKEN environment variable.
@@ -8,9 +9,7 @@ usage:
       docker:
         - image: circleci/python:3.6  # python 3.6.x is required for this example
       steps:
-        - checkout
-
         - loadtest/loadtest:
             targetHostUrl: "https://www.example.com"
             nWorkers: 3
-            susTime: 15
+            susTime: 30
