@@ -1,0 +1,53 @@
+description: >
+  performs a loadtest using Necocortix Last-Mile Loadtest service (in a dedicated container)
+docker:
+  - image: circleci/python:3.6 # the primary container, where your job's commands are run
+parameters:
+  targetHostUrl:
+    type: string
+    description: "url of the host to target as victim"
+  nWorkers:
+    type: integer
+    default: 1
+    description: "the # of worker instances to launch (or zero for all available)"
+  altTargetHostUrl:
+    type: string
+    default: '""'
+    description: "an alternative target host URL for comparison"
+  rampUpRate:
+    type: string
+    default: "0"
+    description: "# of simulated users to start per second (overall) (floating point number)"
+  regions:
+    type: string
+    description: "list of geographic regions (space-separated) (or empty for all regions)"
+    default: ""
+  susTime:
+    type: integer
+    default: 10
+    description: "how much time to sustain the test after startup (in seconds)"
+  targetUris:
+    type: string
+    description: "list of URIs to target (space-separated) or empty for root"
+    default: ""
+  usersPerWorker:
+    type: integer
+    default: 6
+    description: "# of simulated users per worker"
+  branch:
+    type: string
+    default: master
+    description: "which branch to get get orb support code from"
+steps:
+  - checkout # check out the code in the project directory
+
+  - loadtest:  # the loadtest command within this orb
+      targetHostUrl: << parameters.targetHostUrl >>
+      nWorkers: << parameters.nWorkers >>
+      susTime: << parameters.susTime >>
+      rampUpRate: << parameters.rampUpRate >>
+      altTargetHostUrl: << parameters.altTargetHostUrl >>
+      regions: << parameters.regions >>
+      usersPerWorker: << parameters.usersPerWorker >>
+      branch: << parameters.branch >>
+      targetUris: << parameters.targetUris >>

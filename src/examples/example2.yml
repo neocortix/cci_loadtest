@@ -1,0 +1,23 @@
+description: >
+  This mainstream example does a small loadtest using a workflow with a job based on the orb.
+  To use this orb, you need to define a $NCS_AUTH_TOKEN environment variable.
+usage:
+  version: 2.1
+  jobs:
+    build:
+      docker:
+        - image: circleci/node:10  # or any executor you like
+      steps:
+        - checkout # check out the code in the project directory
+        - run: echo your BUILD code here
+  workflows:
+    version: 2
+    build_and_test:
+      jobs:
+        - build
+        - loadtest/loadtest:
+            requires:
+              - build
+            targetHostUrl: "https://www.example.com"
+            nWorkers: 3
+            susTime: 30

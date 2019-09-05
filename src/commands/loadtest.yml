@@ -1,0 +1,57 @@
+description: >
+  performs a loadtest using Necocortix Last-Mile Loadtest service (in the current container)
+parameters:
+  targetHostUrl:
+    type: string
+    description: "url of the host to target as victim"
+  nWorkers:
+    type: integer
+    default: 1
+    description: "the # of worker instances to launch (or zero for all available)"
+  altTargetHostUrl:
+    type: string
+    default: '""'
+    description: "an alternative target host URL for comparison"
+  rampUpRate:
+    type: string
+    default: "0"
+    description: "# of simulated users to start per second (overall) (floating point number)"
+  regions:
+    type: string
+    description: "list of geographic regions (space-separated) (or empty for all regions)"
+    default: ""
+  susTime:
+    type: integer
+    default: 10
+    description: "how much time to sustain the test after startup (in seconds)"
+  targetUris:
+    type: string
+    description: "list of URIs to target (space-separated) or empty for root"
+    default: ""
+  usersPerWorker:
+    type: integer
+    default: 6
+    description: "# of simulated users per worker"
+  branch:
+    type: string
+    default: master
+    description: "which branch to get orb support code from"
+steps:
+  - run:
+      name: fetching code (<< parameters.branch >>)
+      command: wget https://raw.githubusercontent.com/neocortix/cci_loadtest/<< parameters.branch >>/runRemoteLoadtest.py
+  - run:
+      name: loadtesting
+      command: >-
+        python3 ./runRemoteLoadtest.py << parameters.targetHostUrl >>
+        --nWorkers << parameters.nWorkers >> --susTime << parameters.susTime >>
+        --rampUpRate << parameters.rampUpRate >> --usersPerWorker << parameters.usersPerWorker >>
+        --altTargetHostUrl << parameters.altTargetHostUrl >>
+        --regions << parameters.regions >>
+        --targetUris << parameters.targetUris >>
+        --jsonOut data/loadtest_out.json --masterUrl  https://load-test.cloud.neocortix.com/
+        --authToken $NCS_AUTH_TOKEN
+  - store_artifacts:
+      path: data
+  #- store_test_results:
+  #    path: data/test-results
