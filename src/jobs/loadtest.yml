@@ -38,6 +38,13 @@ parameters:
     type: string
     default: master
     description: "which branch to get get orb support code from"
+  executor:
+    type: executor
+    default: default
+    description: "(advanced) use this only if you need to override the python executor"
+
+executor: << parameters.executor >>
+
 steps:
   - checkout # check out the code in the project directory
 
