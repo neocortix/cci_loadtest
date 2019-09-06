@@ -85,10 +85,10 @@ workflows:
           name: test-orb-dev
           filters: *integration-dev_filters
           branch: Alpha
-          executorImage: circleci/python:3.6.9
           targetHostUrl: "https://www.example.com"
           nWorkers: 3
           susTime: 15
+          #executorImage: circleci/python:3.6.9
           #altTargetHostUrl: "https://circleci.com"
           regions: >-
             north-america russia-ukraine-belarus
