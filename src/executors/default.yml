@@ -1,9 +1,10 @@
 # How to author Executors: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
 description: >
-  uses a generic python 3 image
+  uses a generic python 3 image, unless the caller overrides
 parameters:
   image:
     type: string
     default: circleci/python:3.6
+    description: (advanced) override the default to use a different docker image
 docker:
   - image: << parameters.image >>
