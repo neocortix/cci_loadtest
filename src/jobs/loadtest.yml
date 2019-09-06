@@ -45,7 +45,8 @@ parameters:
 
 executor:
   name: default
-  image: << parameters.executor >>
+  image: circleci/python:3.7
+  #image: << parameters.executor >>
 
 steps:
   - checkout # check out the code in the project directory
