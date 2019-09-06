@@ -85,6 +85,7 @@ workflows:
           name: test-orb-dev
           filters: *integration-dev_filters
           branch: Alpha
+          executor: circleci/python:3.6.8
           targetHostUrl: "https://www.example.com"
           nWorkers: 3
           susTime: 15
