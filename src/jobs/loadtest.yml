@@ -39,11 +39,13 @@ parameters:
     default: master
     description: "which branch to get get orb support code from"
   executor:
-    type: executor
-    default: default
+    type: string
+    default: circleci/python:3.6
     description: "(advanced) use this only if you need to override the python executor"
 
-executor: << parameters.executor >>
+executor:
+  name: default
+  image: << parameters.executor >>
 
 steps:
   - checkout # check out the code in the project directory
