@@ -1,7 +1,5 @@
 description: >
   performs a loadtest using Necocortix Last-Mile Loadtest service (in a dedicated container)
-#docker:
-#  - image: circleci/python:3.6 # the primary container, where your job's commands are run
 parameters:
   targetHostUrl:
     type: string
@@ -38,15 +36,14 @@ parameters:
     type: string
     default: master
     description: "which branch to get get orb support code from"
-  executor:
+  executorImage:
     type: string
     default: circleci/python:3.6
     description: "(advanced) use this only if you need to override the python executor"
 
 executor:
   name: default
-  #image: circleci/python:3.7
-  image: << parameters.executor >>
+  image: << parameters.executorImage >>
 
 steps:
   - checkout # check out the code in the project directory

@@ -4,6 +4,6 @@ description: >
 parameters:
   image:
     type: string
-    default: circleci/python:3.5
+    default: circleci/python:3.6
 docker:
   - image: << parameters.image >>
