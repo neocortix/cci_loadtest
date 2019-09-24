@@ -86,7 +86,7 @@ workflows:
           filters: *integration-dev_filters
           branch: Alpha
           targetHostUrl: "https://www.example.com"
-          nWorkers: 3
+          nWorkers: 2
           susTime: 15
           #executorImage: circleci/python:3.6.9
           #altTargetHostUrl: "https://circleci.com"
@@ -100,7 +100,7 @@ workflows:
           filters: *integration-master_filters
           branch: master
           targetHostUrl: "https://www.example.com"
-          nWorkers: 4
+          nWorkers: 2
           susTime: 30
           altTargetHostUrl: "https://circleci.com"
           regions: >-

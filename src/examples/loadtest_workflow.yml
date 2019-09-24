@@ -19,5 +19,5 @@ usage:
             requires:
               - build
             targetHostUrl: "https://www.example.com"
-            nWorkers: 3
+            nWorkers: 2
             susTime: 30
