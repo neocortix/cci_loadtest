@@ -27,10 +27,18 @@ import time
 logger = logging.getLogger(__name__)
 
 
-def startTest( testsUrl, reqParams ):
+def ncscReqHeaders( authToken ):
+    return {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-Neocortix-Cloud-API-Version": "1",
+        "X-Neocortix-Cloud-API-AuthToken": authToken
+    }
+
+def startTest( testsUrl, reqParams, authToken ):
     reqDataStr = json.dumps( reqParams )
     #logger.debug( 'reqDataStr: %s', reqDataStr )
-    resp = requests.post( testsUrl, data=reqDataStr )
+    resp = requests.post( testsUrl, data=reqDataStr, headers=ncscReqHeaders(authToken) )
     logger.info( 'POST status_code %d', resp.status_code )
     logger.info( 'POST text %s', resp.text )
     respJson = resp.json()
@@ -41,7 +49,7 @@ def startTest( testsUrl, reqParams ):
 def downloadDataFile(url, dataDirPath):
     local_filename = dataDirPath + '/' + url.split('/')[-1]
     # make request with stream=True
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, stream=True, headers=ncscReqHeaders(args.authToken)) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192): 
@@ -78,7 +86,7 @@ if __name__ == "__main__":
     ap.add_argument( '--authToken', required=True, help='the NCS authorization token to use' )
     ap.add_argument( '--altTargetHostUrl', help='an alternative target host URL for comparison' )
     ap.add_argument('--jsonOut', help='file path to write detailed info in json format')
-    ap.add_argument( '--masterUrl', default='http://localhost', help='url of the master' )
+    ap.add_argument( '--masterUrl', default='https://load-test.cloud.neocortix.com/', help='url of the master' )
     ap.add_argument( '--nWorkers', type=int, default=1, help='the # of worker instances to launch (or zero for all available)' )
     ap.add_argument( '--rampUpRate', type=float, default=0, help='# of simulated users to start per second (overall)' )
     ap.add_argument( '--regions', nargs='*', help='list of geographic regions (or none for all regions)' )
@@ -101,10 +109,14 @@ if __name__ == "__main__":
     # dont' print the text; that would be the web page source
     #logger.info( 'resp.text %s', resp.text )
 
-    testsUrl = masterUrl+'/api/tests/'
+    betaTest = True
+    if betaTest:
+        testsUrl = 'https://cloud.neocortix.com/cloud-api/load-test-beta/'
+    else:
+        testsUrl = masterUrl+'/api/tests/'
     # get /tests/
-    resp = requests.get( testsUrl )
-    logger.info( '/api/tests/ status_code %d', resp.status_code )
+    #resp = requests.get( testsUrl )
+    #logger.info( 'testsUrl status_code %d', resp.status_code )
     #logger.info( '/api/tests/ json %s', resp.json() )
 
     # set params for tests
@@ -133,7 +145,7 @@ if __name__ == "__main__":
         reqParams.append( filterArg )
     
     # start test
-    testId = startTest( testsUrl, reqParams )
+    testId = startTest( testsUrl, reqParams, args.authToken )
     logger.info( 'testId: %s', testId )
 
     # result dict from the service
@@ -144,7 +156,7 @@ if __name__ == "__main__":
         anyRunning = False
         statusUrl = testsUrl + testId
         logger.info( 'polling: %s', statusUrl )
-        resp = requests.get( statusUrl )
+        resp = requests.get( statusUrl, headers=ncscReqHeaders(args.authToken) )
         if resp.status_code != 200:
             logger.warning( 'poll status_code %d', resp.status_code )
         else:
