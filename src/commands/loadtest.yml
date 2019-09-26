@@ -76,7 +76,7 @@ steps:
         --regions << parameters.regions >>
         --targetUris << parameters.targetUris >>
         --jsonOut data/loadtest_out.json --masterUrl  https://load-test.cloud.neocortix.com/
-        --authToken << parameters.ncs_auth_token >>
+        --authToken ${<< parameters.ncs_auth_token >>}
   - store_artifacts:
       path: data
   #- store_test_results:
