@@ -36,6 +36,10 @@ parameters:
     type: string
     default: master
     description: "which branch to get orb support code from"
+  ncs_auth_token:
+    type: env_var_name
+    default: NCS_AUTH_TOKEN
+    description: "(advanced) the name of the env var to use for NCS_AUTH_TOKEN)"
 steps:
   - run:
       name: checking for required python version
@@ -72,7 +76,7 @@ steps:
         --regions << parameters.regions >>
         --targetUris << parameters.targetUris >>
         --jsonOut data/loadtest_out.json --masterUrl  https://load-test.cloud.neocortix.com/
-        --authToken $NCS_AUTH_TOKEN
+        --authToken << parameters.ncs_auth_token >>
   - store_artifacts:
       path: data
   #- store_test_results:
