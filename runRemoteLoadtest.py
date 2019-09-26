@@ -109,7 +109,7 @@ if __name__ == "__main__":
     # dont' print the text; that would be the web page source
     #logger.info( 'resp.text %s', resp.text )
 
-    betaTest = True
+    betaTest = not True
     if betaTest:
         testsUrl = 'https://cloud.neocortix.com/cloud-api/load-test-beta/'
     else:
