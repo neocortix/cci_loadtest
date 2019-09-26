@@ -40,6 +40,10 @@ parameters:
     type: string
     default: circleci/python:3.6
     description: "(advanced) use this only if you need to override the python executor"
+  ncs_auth_token:
+    type: env_var_name
+    default: NCS_AUTH_TOKEN
+    description: "(advanced) the name of the env var to use for NCS_AUTH_TOKEN)"
 
 executor:
   name: default
@@ -58,3 +62,4 @@ steps:
       usersPerWorker: << parameters.usersPerWorker >>
       branch: << parameters.branch >>
       targetUris: << parameters.targetUris >>
+      ncs_auth_token: << parameters.ncs_auth_token >>
