@@ -48,8 +48,11 @@ def startTest( testsUrl, reqParams, authToken ):
 
 def downloadDataFile(url, dataDirPath):
     local_filename = dataDirPath + '/' + url.split('/')[-1]
+    headers = ncscReqHeaders(args.authToken)
+    headers[ 'Accept' ] = 'application/json, text/html, image/*'
     # make request with stream=True
-    with requests.get(url, stream=True, headers=ncscReqHeaders(args.authToken)) as r:
+    with requests.get(url, stream=True, headers=headers) as r:
+        logger.info( 'status_code %d for url %s', r.status_code, url )
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192): 
@@ -109,7 +112,7 @@ if __name__ == "__main__":
     # dont' print the text; that would be the web page source
     #logger.info( 'resp.text %s', resp.text )
 
-    betaTest = not True
+    betaTest = True
     if betaTest:
         testsUrl = 'https://cloud.neocortix.com/cloud-api/load-test-beta/'
     else:
