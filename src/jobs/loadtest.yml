@@ -22,7 +22,7 @@ parameters:
     default: ""
   susTime:
     type: integer
-    default: 10
+    default: 15
     description: "how much time to sustain the test after startup (in seconds)"
   targetUris:
     type: string
