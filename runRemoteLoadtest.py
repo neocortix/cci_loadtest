@@ -112,9 +112,9 @@ if __name__ == "__main__":
     # dont' print the text; that would be the web page source
     #logger.info( 'resp.text %s', resp.text )
 
-    betaTest = True
-    if betaTest:
-        testsUrl = 'https://cloud.neocortix.com/cloud-api/load-test-beta/'
+    newApi = True
+    if newApi:
+        testsUrl = 'https://cloud.neocortix.com/cloud-api/load-test/'
     else:
         testsUrl = masterUrl+'/api/tests/'
     # get /tests/
@@ -128,25 +128,43 @@ if __name__ == "__main__":
     susTime = args.susTime
     usersPerWorker = args.usersPerWorker
     rampUpRate = args.rampUpRate
-    reqParams = [args.victimHostUrl, "<MasterHostUnspecified>",
-        "--authToken", args.authToken, "--nWorkers", str(nWorkers),
-        "--susTime", str(susTime), "--usersPerWorker", str(usersPerWorker),
-        "--rampUpRate", str(rampUpRate), "--startTimeLimit", str(startTimeLimit)
-        ]
-    if args.altTargetHostUrl:
-        reqParams.append( '--altTargetHostUrl' )
-        reqParams.append( args.altTargetHostUrl )
-    if args.targetUris:
-        reqParams.append( '--targetUris' )
-        for uri in args.targetUris:
-            reqParams.append( uri )
-    if args.regions:
-        regionsDict = {'regions': args.regions}
-        filterArg = json.dumps( regionsDict )
-        # this code could become trickier if other filter args are supported
-        reqParams.append( '--filter' )
-        reqParams.append( filterArg )
-    
+    if newApi:
+        reqParams = { "url": args.victimHostUrl,
+            "num-workers": str(nWorkers),
+            "duration": str(susTime), 
+            "users-per-worker": str(usersPerWorker),
+            "ramp-up-rate": str(rampUpRate)
+        }
+        if args.altTargetHostUrl:
+            reqParams["alt-target-url"] = args.altTargetHostUrl
+        if args.targetUris:
+            reqParams["target-uris" ] = args.targetUris
+        if args.regions:
+            regionsDict = {'regions': args.regions}
+            filterArg = json.dumps( regionsDict )
+            # this code could become trickier if other filter args are supported
+            reqParams['filter'] = regionsDict
+            #reqParams['filter'] = filterArg
+    else:
+        reqParams = [args.victimHostUrl, "<MasterHostUnspecified>",
+            "--authToken", args.authToken, "--nWorkers", str(nWorkers),
+            "--susTime", str(susTime), "--usersPerWorker", str(usersPerWorker),
+            "--rampUpRate", str(rampUpRate), "--startTimeLimit", str(startTimeLimit)
+            ]
+        if args.altTargetHostUrl:
+            reqParams.append( '--altTargetHostUrl' )
+            reqParams.append( args.altTargetHostUrl )
+        if args.targetUris:
+            reqParams.append( '--targetUris' )
+            for uri in args.targetUris:
+                reqParams.append( uri )
+        if args.regions:
+            regionsDict = {'regions': args.regions}
+            filterArg = json.dumps( regionsDict )
+            # this code could become trickier if other filter args are supported
+            reqParams.append( '--filter' )
+            reqParams.append( filterArg )
+    logger.info( 'reqParams: %s', reqParams )    
     # start test
     testId = startTest( testsUrl, reqParams, args.authToken )
     logger.info( 'testId: %s', testId )
@@ -166,9 +184,12 @@ if __name__ == "__main__":
             respJson = resp.json()
             result = respJson
             logger.info( 'poll json state: %s', respJson['state'] )
-            logger.info( 'poll json stderr: %s',
-                '\n'.join( respJson['stderr'].splitlines()[-5:] ) )
-            anyRunning = anyRunning or respJson['state'] == 'running'
+            if respJson.get( 'stderr' ):
+                logger.info( 'poll json stderr: %s',
+                    '\n'.join( respJson['stderr'].splitlines()[-5:] ) )
+            else:
+                logger.warning( 'no stderr object in returned json' )
+            anyRunning = anyRunning or respJson['state'] in ['launching', 'running' ]
             #if respJson['state'] == 'stopped':
             #    break
         if not anyRunning:
