@@ -6,9 +6,11 @@ description: |
 
   o	Get an Auth Token by following these steps:
   •	Go to cloud.neocortix.com
-  •	Sign up for a Neocortix Cloud Services account with your email address.  
-  o	You will be able to run small, free Load Tests (with 2 devices, up to 10 minutes long) without providing any payment method.  
+  •	Sign up for a Neocortix Cloud Services account with your email address.
+  o	You will be able to run small, free Load Tests (with 2 devices, up to 10 minutes long) without
+    providing any payment method.
   o	To run medium-sized, free Load Tests (up to 10 devices, up to 10 minutes long), please provide a Payment Method at Account / Billing / Payment Methods, which will not be charged while you use your 100 free hours.  
-  o	To run Large Load Tests (up to 1000 devices, any duration), please provide a Payment Method as above, and then go to Account / Profile and check the box that says “Stop Using Free Hours, Remove Account Limitations”.  Your account will be charged for these large Load Tests.
+  o	To run Large Load Tests (up to 1000 devices, any duration), please provide a Payment Method as
+    above, and then go to Account / Profile and check the box that says “Stop Using Free Hours, Remove Account Limitations”.  Your account will be charged for these large Load Tests.
   •	Go to Account / Profile.  Click on Auth Tokens.
   •	Click on New Token.  A new Auth Token will be generated for you.  You can copy that Auth Token to the clipboard and use it as the value of $NCS_AUTH_TOKEN in the steps below.
