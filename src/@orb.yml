@@ -12,3 +12,4 @@ description: |
       - To run Large Load Tests (up to 800 devices, any duration), please provide a Payment Method as above, and then go to Account / Billing and upgrade from Free Tier to Paid Tier.
   - Go to Account / Profile.  Click on Auth Tokens.
   - Click on New Token.  A new Auth Token will be generated for you.  You can copy that Auth Token to the clipboard and use it as the value of $NCS_AUTH_TOKEN in the steps below.
+
