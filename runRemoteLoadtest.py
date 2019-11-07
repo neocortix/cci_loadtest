@@ -61,6 +61,12 @@ def downloadDataFile(url, dataDirPath):
                     # f.flush()
     return
 
+def downloadDataFileNoExc(url, dataDirPath):
+    try:
+        downloadDataFile( url, dataDirPath )
+    except Exception as exc:
+        logger.warning( 'exception (%s) downloading; %s', type(exc), exc )
+
 def genXml():
     '''preliminary version generates "fake" junit-style xml'''
     template = '''<?xml version="1.0" ?>
@@ -228,10 +234,21 @@ if __name__ == "__main__":
             downloadDataFile( dataUrlPrefix + '/locustStats.jlog', dataDirPath )
         except Exception as exc:
             logger.warning( 'exception (%s) downloading; %s', type(exc), exc )
-        try:
-            downloadDataFile( dataUrlPrefix + '/integratedPerf.png', dataDirPath )
-        except Exception as exc:
-            logger.warning( 'exception (%s) downloading; %s', type(exc), exc )
+        #try:
+        #    downloadDataFile( dataUrlPrefix + '/integratedPerf.png', dataDirPath )
+        #except Exception as exc:
+        #    logger.warning( 'exception (%s) downloading; %s', type(exc), exc )
+        for partialUrl in [
+            'countryData.png',
+            'durationHistogram.png',
+            'durationHistogramLoaded.png',
+            'integratedPerf.png',
+            'msprScatter1.png',
+            'nWorkers.png',
+            'rps.png',
+            'simulatedUsers.png'
+            ]:
+            downloadDataFileNoExc( dataUrlPrefix + '/' + partialUrl, dataDirPath )
 
     if False:
         # generate fake junit-style xml test result file
