@@ -16,6 +16,10 @@ parameters:
     type: string
     default: "0"
     description: "# of simulated users to start per second (overall) (floating point number)"
+  reqMsprMean:
+    type: integer
+    default: 1000
+    description: "pass/fail threshold for mean response time (in milliseconds)"
   regions:
     type: string
     description: "list of geographic regions (space-separated) (or empty for all regions)"
@@ -72,6 +76,7 @@ steps:
         python3 ./runRemoteLoadtest.py << parameters.targetHostUrl >>
         --nWorkers << parameters.nWorkers >> --susTime << parameters.susTime >>
         --rampUpRate << parameters.rampUpRate >> --usersPerWorker << parameters.usersPerWorker >>
+        --reqMsprMean << parameters.reqMsprMean >>
         --altTargetHostUrl << parameters.altTargetHostUrl >>
         --regions << parameters.regions >>
         --targetUris << parameters.targetUris >>
@@ -79,5 +84,5 @@ steps:
         --authToken ${<< parameters.ncs_auth_token >>}
   - store_artifacts:
       path: data
-  #- store_test_results:
-  #    path: data/test-results
+  - store_test_results:
+      path: data/test-results
