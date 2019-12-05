@@ -99,6 +99,7 @@ if __name__ == "__main__":
     ap.add_argument( '--nWorkers', type=int, default=1, help='the # of worker instances to launch (or zero for all available)' )
     ap.add_argument( '--rampUpRate', type=float, default=0, help='# of simulated users to start per second (overall)' )
     ap.add_argument( '--regions', nargs='*', help='list of geographic regions (or none for all regions)' )
+    ap.add_argument( '--reqMsprMean', type=float, default=1000, help='required ms per response' )
     ap.add_argument( '--susTime', type=int, default=10, help='time to sustain the test after startup (in seconds)' )
     ap.add_argument( '--targetUris', nargs='*', help='list of URIs to target' )
     ap.add_argument( '--usersPerWorker', type=int, default=6, help='# of simulated users per worker' )
@@ -139,6 +140,7 @@ if __name__ == "__main__":
             "num-workers": str(nWorkers),
             "duration": str(susTime), 
             "users-per-worker": str(usersPerWorker),
+            "reqMsprMean": str(args.reqMsprMean),
             "ramp-up-rate": str(rampUpRate)
         }
         if args.altTargetHostUrl:
@@ -155,6 +157,7 @@ if __name__ == "__main__":
         reqParams = [args.victimHostUrl, "<MasterHostUnspecified>",
             "--authToken", args.authToken, "--nWorkers", str(nWorkers),
             "--susTime", str(susTime), "--usersPerWorker", str(usersPerWorker),
+            "--reqMsprMean", str(args.reqMsprMean),
             "--rampUpRate", str(rampUpRate), "--startTimeLimit", str(startTimeLimit)
             ]
         if args.altTargetHostUrl:
@@ -203,18 +206,19 @@ if __name__ == "__main__":
         time.sleep( 5 )
 
     # check result
-    success = False
+    xmlOk = False
+    gotStdout = False
     if not result:
         print( '>>NO result for', testId )
     else:
         if result.get('stdout'):
-            success = True
+            gotStdout = True
             print('>>stdout from', testId)
             print( result['stdout'] )
         else:
             print('>>NO stdout from', testId)
 
-    if success:
+    if gotStdout:
         dataUrlPrefix = testsUrl + testId
         if args.altTargetHostUrl:
             try:
@@ -239,6 +243,7 @@ if __name__ == "__main__":
         #except Exception as exc:
         #    logger.warning( 'exception (%s) downloading; %s', type(exc), exc )
         for partialUrl in [
+            'testResults.xml',
             'countryData.png',
             'durationHistogram.png',
             'durationHistogramLoaded.png',
@@ -249,16 +254,16 @@ if __name__ == "__main__":
             'simulatedUsers.png'
             ]:
             downloadDataFileNoExc( dataUrlPrefix + '/' + partialUrl, dataDirPath )
-
-    if False:
-        # generate fake junit-style xml test result file
-        xmlOut = genXml()
-        junitResultDirPath = dataDirPath + '/test-results/loadtest'
-        junitResultFilePath = junitResultDirPath + '/results.xml'
-        os.makedirs( junitResultDirPath, exist_ok=True )
-        with open( junitResultFilePath, 'w', encoding='utf8') as outFile:
-            outFile.write( xmlOut )
-
+        # move the xml report into place and check it for errors and failures
+        if os.path.isfile( dataDirPath + '/testResults.xml' ):
+            junitResultDirPath = dataDirPath + '/test-results/loadtest'
+            junitResultFilePath = junitResultDirPath + '/results.xml'
+            os.makedirs( junitResultDirPath, exist_ok=True )
+            shutil.move( dataDirPath + '/testResults.xml', junitResultFilePath )
+            with open( junitResultFilePath, encoding='utf8' ) as inFile:
+                xml = inFile.read()
+            if '<testcase' in xml and '<error' not in xml and '<failure' not in xml:
+                xmlOk = True
 
     # save detailed outputs, if requested
     if args.jsonOut:
@@ -269,4 +274,4 @@ if __name__ == "__main__":
         with open( jsonOutFilePath, 'w') as outFile:
             json.dump( toSave, outFile, indent=2 )
             #json.dump( toSave, outFile, default=str, indent=2, skipkeys=True )
-    sys.exit( not success )
+    sys.exit( not xmlOk )
