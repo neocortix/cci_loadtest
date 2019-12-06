@@ -16,14 +16,14 @@ parameters:
     type: string
     default: "0"
     description: "# of simulated users to start per second (overall) (floating point number)"
-  reqMsprMean:
-    type: integer
-    default: 1000
-    description: "pass/fail threshold for mean response time (in milliseconds)"
   regions:
     type: string
     description: "list of geographic regions (space-separated) (or empty for all regions)"
     default: ""
+  reqMsprMean:
+    type: integer
+    default: 1000
+    description: "pass/fail threshold for mean response time (in milliseconds)"
   susTime:
     type: integer
     default: 15

@@ -20,6 +20,10 @@ parameters:
     type: string
     description: "list of geographic regions (space-separated) (or empty for all regions)"
     default: ""
+  reqMsprMean:
+    type: integer
+    default: 1000
+    description: "pass/fail threshold for mean response time (in milliseconds)"
   susTime:
     type: integer
     default: 15
@@ -59,6 +63,7 @@ steps:
       rampUpRate: << parameters.rampUpRate >>
       altTargetHostUrl: << parameters.altTargetHostUrl >>
       regions: << parameters.regions >>
+      reqMsprMean: << parameters.reqMsprMean >>
       usersPerWorker: << parameters.usersPerWorker >>
       branch: << parameters.branch >>
       targetUris: << parameters.targetUris >>
