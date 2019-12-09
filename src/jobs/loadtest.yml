@@ -23,7 +23,7 @@ parameters:
   reqMsprMean:
     type: integer
     default: 1000
-    description: "pass/fail threshold for mean response time (in milliseconds)"
+    description: "Pass/Fail threshold for Mean Response Time (in milliseconds).   The Mean Response Time is calculated in the last 30-second window of the test.  If the Mean Response Time in the last 30-second window is less than the threshold, the test Passes; otherwise it fails."
   susTime:
     type: integer
     default: 15
