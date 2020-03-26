@@ -2,7 +2,6 @@ version: 2.1
 
 description: |
   Perform Neocortix Last-Mile Load Testing for your projects, using our global network of mobile devices.
-  See https://cloud.neocortix.com and https://github.com/neocortix/cci_loadtest for more info.
 
   Get an Auth Token by following these steps:
   - Go to cloud.neocortix.com
@@ -13,3 +12,6 @@ description: |
   - Go to Account / Profile.  Click on Auth Tokens.
   - Click on New Token.  A new Auth Token will be generated for you.  You can copy that Auth Token to the clipboard and use it as the value of $NCS_AUTH_TOKEN in the steps below.
 
+display:
+  home_url: https://cloud.neocortix.com
+  source_url: https://github.com/neocortix/cci_loadtest
